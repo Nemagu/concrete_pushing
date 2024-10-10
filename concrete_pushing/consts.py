@@ -54,36 +54,51 @@ REINFORCEMENT_NORMAL_STRETCHING: dict[str, int] = {
 }
 
 
-class ConcreteConsts:
-    def __init__(
-        self,
-        concrete_class: str,
-        system_measurement: str = 'СИ',
-        value_unit: float = 0.000001,
-    ):
+class SystemMeasurement:
+    def __init__(self, system_measurement: str = 'СИ') -> None:
         """
         Аргументы:\n
-        concrete_class - класс бетона в виде строки \'B20\';\n
         system_measurement - система измерения. По умолчанию СИ, доступна
-        СГС;\n
-        value_unit - коэффициент преобразования единиц: 0.001 - кило,
-        0.000001 - мега.
+        СГС.
         """
         self.system_measurement = system_measurement
-        self.concrete_class = concrete_class
-        self.value_unit = value_unit
-        self.data_validation()
-        self._set_rbtn()
+        self.validation_data()
 
-    def data_validation(self):
-        if self.__dict__.get('concrete_class') not in CONCRETE_CLASSES:
-            raise KeyError('Такой класс бетона не найден.')
-
+    def validation_data(self) -> None:
         if (self.__dict__.get('system_measurement')
                 not in SYSTEMS_MEASUREMENT.keys()):
             raise KeyError('Такая система измерения не поддерживается.')
 
-    def _set_rbtn(self):
+
+class ValueUnit:
+    def __init__(self, value_unit: float = 0.000001) -> None:
+        """
+        Аргументы:\n
+        value_unit - коэффициент преобразования единиц: 0.001 - кило,
+        0.000001 - мега.
+        """
+        self.value_unit = value_unit
+        self.validation_data()
+
+    def validation_data(self) -> None:
+        pass
+
+
+class ConcreteSpecification(SystemMeasurement, ValueUnit):
+    def __init__(self, concrete_class: str) -> None:
+        """
+        Аргументы:\n
+        concrete_class - класс бетона в виде строки \'B20\'.
+        """
+        self.concrete_class = concrete_class
+        self.validation_data()
+        self._set_rbtn()
+
+    def validation_data(self) -> None:
+        if self.__dict__.get('concrete_class') not in CONCRETE_CLASSES:
+            raise KeyError('Такой класс бетона не найден.')
+
+    def _set_rbtn(self) -> None:
         self._rbtn = CONCRETE_NORMAL_AXIAL_COMPRESSION.get(
             self.concrete_class
         )
@@ -92,7 +107,7 @@ class ConcreteConsts:
         """
         Получение нормативного осевого растяжения.
         """
-        return self._rbtn * self.value_unit
+        return self._rbtn
 
     def get_rbt(self, ybi: float = 0.9) -> float:
         """
@@ -103,34 +118,21 @@ class ConcreteConsts:
         return self.get_rbtn() * ybi
 
 
-class ReinforcementConsts:
-    def __init__(
-        self,
-        reinforcement_class: str,
-        unit_measurement: str = 'СИ',
-        value_unit: float = 0.000001,
-    ):
+class ReinforcementSpecification:
+    def __init__(self, reinforcement_class: str) -> None:
         """
         Аргументы:\n
-        reinforcement_class - класс арматуры в виде строки \'A240\';\n
-        unit_measurement - система измерения. По умолчанию СИ, доступна СГС;\n
-        value_unit - коэффициент преобразования единиц: 0.001 - кило,
-        0.000001 - мега.
+        reinforcement_class - класс арматуры в виде строки \'A240\'.
         """
         self.reinforcement_class = reinforcement_class
-        self.value_unit = value_unit
-        self.data_validation()
+        self.validation_data()
         self._set_rs()
 
-    def data_validation(self):
+    def validation_data(self) -> None:
         if self.__dict__.get('concrete_class') not in REINFORCEMENT_CLASSES:
             raise KeyError('Такой класс арматуры не найден.')
 
-        if (self.__dict__.get('system_measurement')
-                not in SYSTEMS_MEASUREMENT.keys()):
-            raise KeyError('Такая система измерения не поддерживается.')
-
-    def _set_rs(self):
+    def _set_rs(self) -> None:
         self._rs = REINFORCEMENT_NORMAL_STRETCHING.get(
             self.reinforcement_class
         )
@@ -139,7 +141,7 @@ class ReinforcementConsts:
         """
         Получение нормативного продольного растяжения.
         """
-        return self._rs * self.value_unit
+        return self._rs
 
     def get_rsw(self, ybi: float = 1.0) -> float:
         """
