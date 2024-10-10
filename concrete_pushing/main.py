@@ -198,7 +198,7 @@ class OnlyForceWithReinforcement(Reinforcement, OnlyForce):
         return self.fswult
 
     def get_fult(self):
-        self.get_fbult()
+        super().get_fult()
         self.get_fswult()
         if self.fswult < (self.fbult * 0.25):
             return self.fbult
