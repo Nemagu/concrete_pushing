@@ -95,7 +95,7 @@ class ConcreteSpecification(SystemMeasurement, ValueUnit):
         self._set_rbtn()
 
     def validation_data(self) -> None:
-        if self.__dict__.get('concrete_class') not in CONCRETE_CLASSES:
+        if self.concrete_class not in CONCRETE_CLASSES:
             raise KeyError('Такой класс бетона не найден.')
 
     def _set_rbtn(self) -> None:
@@ -129,7 +129,7 @@ class ReinforcementSpecification:
         self._set_rs()
 
     def validation_data(self) -> None:
-        if self.__dict__.get('concrete_class') not in REINFORCEMENT_CLASSES:
+        if self.reinforcement_class not in REINFORCEMENT_CLASSES:
             raise KeyError('Такой класс арматуры не найден.')
 
     def _set_rs(self) -> None:
